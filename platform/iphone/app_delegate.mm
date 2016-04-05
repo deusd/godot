@@ -48,6 +48,11 @@
 #import "FBSDKCoreKit/FBSDKCoreKit.h"
 #endif
 
+#ifdef MODULE_FABRIC_IOS_ENABLED
+#import <Fabric/Fabric.h>
+#import <Crashlytics/Crashlytics.h>
+#endif
+
 #define kFilteringFactor                        0.1
 #define kRenderingFrequency						60
 #define kAccelerometerFrequency         100.0 // Hz
@@ -263,6 +268,10 @@ static int frame_count = 0;
 	//OSIPhone::screen_height = rect.size.height - rect.origin.y;
 
 	mainViewController = view_controller;
+
+#ifdef MODULE_FABRIC_IOS_ENABLED
+    [Fabric with:@[[Crashlytics class]]];
+#endif
 
 #ifdef MODULE_GAME_ANALYTICS_ENABLED
     printf("********************* didFinishLaunchingWithOptions\n");
