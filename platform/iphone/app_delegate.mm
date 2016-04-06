@@ -270,6 +270,7 @@ static int frame_count = 0;
 	mainViewController = view_controller;
 
 #ifdef MODULE_FABRIC_IOS_ENABLED
+		printf("********************* Fabric.io Crashlytics enabled \n");
     [Fabric with:@[[Crashlytics class]]];
 #endif
 
