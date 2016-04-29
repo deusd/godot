@@ -470,6 +470,8 @@ void EditorSettings::_load_defaults(Ref<ConfigFile> p_extra_config) {
 	hints["global/default_project_export_path"]=PropertyInfo(Variant::STRING,"global/default_project_export_path",PROPERTY_HINT_GLOBAL_DIR);
 	set("global/show_script_in_scene_tabs",false);
 	set("text_editor/background_color",Color::html("3b000000"));
+	set("text_editor/caret_color",Color::html("aaaaaa"));
+	set("text_editor/line_number_color",Color::html("66aaaaaa"));
 	set("text_editor/text_color",Color::html("aaaaaa"));
 	set("text_editor/text_selected_color",Color::html("000000"));
 	set("text_editor/keyword_color",Color::html("ffffb3"));
@@ -496,6 +498,7 @@ void EditorSettings::_load_defaults(Ref<ConfigFile> p_extra_config) {
 
 	set("text_editor/show_line_numbers", true);
 
+	set("text_editor/trim_trailing_whitespace_on_save", false);
 	set("text_editor/idle_parse_delay",2);
 	set("text_editor/create_signal_callbacks",true);
 	set("text_editor/autosave_interval_secs",0);
@@ -526,6 +529,7 @@ void EditorSettings::_load_defaults(Ref<ConfigFile> p_extra_config) {
 	set("3d_editor/zoom_modifier",4);
 	hints["3d_editor/zoom_modifier"]=PropertyInfo(Variant::INT,"3d_editor/zoom_modifier",PROPERTY_HINT_ENUM,"None,Shift,Alt,Meta,Ctrl");
 	set("3d_editor/emulate_numpad",false);
+	set("3d_editor/trackpad_hint", false);
 
 	set("2d_editor/bone_width",5);
 	set("2d_editor/bone_color1",Color(1.0,1.0,1.0,0.9));

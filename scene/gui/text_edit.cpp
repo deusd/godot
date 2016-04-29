@@ -681,14 +681,12 @@ void TextEdit::_notification(int p_what) {
 				}
 
 				if (cache.line_number_w) {
-					Color fcol = cache.font_color;
-					fcol.a*=0.4;
 					String fc = String::num(line+1);
 					while (fc.length() < line_number_char_count) {
 						fc="0"+fc;
 					}
 
-					cache.font->draw(ci,Point2(cache.style_normal->get_margin(MARGIN_LEFT),ofs_y+cache.font->get_ascent()),fc,fcol);
+					cache.font->draw(ci,Point2(cache.style_normal->get_margin(MARGIN_LEFT),ofs_y+cache.font->get_ascent()),fc,cache.line_number_color);
 				}
 
 				const Map<int,Text::ColorRegionInfo>& cri_map=text.get_color_region_info(line);
@@ -910,9 +908,9 @@ void TextEdit::_notification(int p_what) {
 						cursor_pos = Point2i( char_ofs+char_margin, ofs_y );
 						if (insert_mode) {
 							cursor_pos.y += get_row_height();
-							VisualServer::get_singleton()->canvas_item_add_rect(ci,Rect2(cursor_pos, Size2i(char_w,1)),cache.font_color);
+							VisualServer::get_singleton()->canvas_item_add_rect(ci,Rect2(cursor_pos, Size2i(char_w,1)),cache.caret_color);
 						} else {
-							VisualServer::get_singleton()->canvas_item_add_rect(ci,Rect2(cursor_pos, Size2i(1,get_row_height())),cache.font_color);
+							VisualServer::get_singleton()->canvas_item_add_rect(ci,Rect2(cursor_pos, Size2i(1,get_row_height())),cache.caret_color);
 						}
 
 
@@ -927,9 +925,9 @@ void TextEdit::_notification(int p_what) {
 					if (insert_mode) {
 						cursor_pos.y += get_row_height();
 						int char_w = cache.font->get_char_size(' ').width;
-						VisualServer::get_singleton()->canvas_item_add_rect(ci,Rect2(cursor_pos, Size2i(char_w,1)),cache.font_color);
+						VisualServer::get_singleton()->canvas_item_add_rect(ci,Rect2(cursor_pos, Size2i(char_w,1)),cache.caret_color);
 					} else {
-						VisualServer::get_singleton()->canvas_item_add_rect(ci,Rect2(cursor_pos, Size2i(1,get_row_height())),cache.font_color);
+						VisualServer::get_singleton()->canvas_item_add_rect(ci,Rect2(cursor_pos, Size2i(1,get_row_height())),cache.caret_color);
 					}
 				}
 			}
@@ -2023,7 +2021,17 @@ void TextEdit::_input_event(const InputEvent& p_input_event) {
 						scancode_handled=false;
 						break;
 					}
-#ifdef APPLE_STYLE_KEYS
+#ifndef APPLE_STYLE_KEYS
+					if (k.mod.command) {
+						_scroll_lines_up();
+						break;
+					}
+#else
+					if (k.mod.command && k.mod.alt) {
+						_scroll_lines_up();
+						break;
+					}
+
 					if (k.mod.command)
 						cursor_set_line(0);
 					else
@@ -2050,7 +2058,17 @@ void TextEdit::_input_event(const InputEvent& p_input_event) {
 						scancode_handled=false;
 						break;
 					}
-#ifdef APPLE_STYLE_KEYS
+#ifndef APPLE_STYLE_KEYS
+					if (k.mod.command) {
+						_scroll_lines_down();
+						break;
+					}
+#else
+					if (k.mod.command && k.mod.alt) {
+						_scroll_lines_down();
+						break;
+					}
+
 					if (k.mod.command)
 						cursor_set_line(text.size()-1);
 					else
@@ -2462,6 +2480,36 @@ void TextEdit::_post_shift_selection() {
 
 
 	selection.selecting_text=true;
+}
+
+void TextEdit::_scroll_lines_up() {
+	// adjust the vertical scroll
+	if (get_v_scroll() > 0) {
+		set_v_scroll(get_v_scroll() - 1);
+	}
+
+	// adjust the cursor
+	if (cursor_get_line() >= (get_visible_rows() + get_v_scroll()) && !selection.active) {
+		cursor_set_line((get_visible_rows() + get_v_scroll()) - 1, false);
+	}
+}
+
+void TextEdit::_scroll_lines_down() {
+	// calculate the maximum vertical scroll position
+	int max_v_scroll = get_line_count() - 1;
+	if (!scroll_past_end_of_file_enabled) {
+		max_v_scroll -= get_visible_rows() - 1;
+	}
+
+	// adjust the vertical scroll
+	if (get_v_scroll() < max_v_scroll) {
+		set_v_scroll(get_v_scroll() + 1);
+	}
+
+	// adjust the cursor
+	if ((cursor_get_line()) <= get_v_scroll() - 1 && !selection.active) {
+		cursor_set_line(get_v_scroll(), false);
+	}
 }
 
 /**** TEXT EDIT CORE API ****/
@@ -3046,6 +3094,8 @@ void TextEdit::_update_caches() {
 	cache.style_normal=get_stylebox("normal");
 	cache.style_focus=get_stylebox("focus");
 	cache.font=get_font("font");
+	cache.caret_color=get_color("caret_color");
+	cache.line_number_color=get_color("line_number_color");
 	cache.font_color=get_color("font_color");
 	cache.font_selected_color=get_color("font_selected_color");
 	cache.keyword_color=get_color("keyword_color");

@@ -2663,6 +2663,7 @@ void EditorNode::_menu_option_confirm(int p_option,bool p_confirmed) {
 				break;
 			}
 
+			_menu_option_confirm(RUN_STOP,true);
 			get_tree()->quit();
 			String exec = OS::get_singleton()->get_executable_path();
 
@@ -5808,11 +5809,6 @@ EditorNode::EditorNode() {
 
 
 
-	file_export_check = memnew( CheckButton );
-	file_export_check->set_text("Enable Debugging");
-	file_export_check->set_pressed(true);
-	file_export_check->connect("pressed",this,"_export_debug_toggled");
-	file_export->get_vbox()->add_margin_child("Debug:",file_export_check);
 	file_export_password = memnew( LineEdit );
 	file_export_password->set_secret(true);
 	file_export_password->set_editable(false);

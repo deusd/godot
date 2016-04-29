@@ -73,6 +73,8 @@ class TextEdit : public Control  {
 		Ref<StyleBox> style_normal;
 		Ref<StyleBox> style_focus;
 		Ref<Font> font;
+		Color caret_color;
+		Color line_number_color;
 		Color font_color;
 		Color font_selected_color;
 		Color keyword_color;
@@ -255,6 +257,9 @@ class TextEdit : public Control  {
 
 	void _pre_shift_selection();
 	void _post_shift_selection();
+
+	void _scroll_lines_up();
+	void _scroll_lines_down();
 
 //	void mouse_motion(const Point& p_pos, const Point& p_rel, int p_button_mask);
 	Size2 get_minimum_size();
